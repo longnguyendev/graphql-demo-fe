@@ -10,15 +10,14 @@ const schema = yup
   .object({
     email: yup
       .string()
-      .email("This field must be a Email")
+      .email("Enter valid email")
       .required("Email is required")
-      .min(6, "less 6 chacracter")
-      .max(50, "mot more than 255 character"),
+      .max(255, "Email must not exceed 255 characters"),
     password: yup
       .string()
       .required("Password is required")
-      .min(6, "password more than 6 charater")
-      .max(50, "not more than 50 chacracter"),
+      .min(6, "Password contains at least 6 characters")
+      .max(255, "Password must not exceed 255 characters"),
   })
   .required();
 
@@ -89,7 +88,12 @@ export function LoginPage() {
           Login
         </Button>
         <Typography component="span"> Don't have an account? </Typography>
-        <Link component={RouteLink} to="/sign-up" variant="body2">
+        <Link
+          component={RouteLink}
+          to="/sign-up"
+          variant="body2"
+          sx={{ textDecoration: "none" }}
+        >
           Register now
         </Link>
       </Box>

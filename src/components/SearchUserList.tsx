@@ -10,10 +10,16 @@ interface SearchUserListProps {
 
 export function SearchUserList({ data, onClick }: SearchUserListProps) {
   if (data?.users.nodes?.length) {
+    const length = data.users.nodes.length;
     return (
       <List>
-        {data.users.nodes.map((node) => (
-          <SearchUserListItem key={node.id} onClick={onClick} {...node} />
+        {data.users.nodes.map((node, index) => (
+          <SearchUserListItem
+            key={node.id}
+            onClick={onClick}
+            {...node}
+            divider={length - 1 !== index}
+          />
         ))}
       </List>
     );

@@ -203,6 +203,7 @@ export type SubscriptionMessageCreatedArgs = {
 
 export type User = {
   __typename?: 'User';
+  bio: Scalars['String']['output'];
   createdAt: Scalars['Date']['output'];
   dob: Scalars['Date']['output'];
   email: Scalars['String']['output'];

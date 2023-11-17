@@ -11,16 +11,18 @@ import {
 
 interface SearchUserListItemProps extends UserDataFragment {
   onClick: (id: number) => void;
+  divider?: boolean;
 }
 
 export function SearchUserListItem({
   id,
   name,
   onClick,
+  divider,
 }: SearchUserListItemProps) {
   return (
     <ListItem
-      divider
+      divider={divider}
       secondaryAction={
         <IconButton edge="end" onClick={() => onClick(id)}>
           <Add />

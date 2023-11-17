@@ -386,8 +386,6 @@ export function BaseLayout() {
           >
             <Typography variant="h4">Chats</Typography>
             <SearchUser />
-            {loading ? <LoadingSpinner /> : <ConversationList data={data} />}
-            <Box ref={ref} />
             <Button
               onClick={handleOpenModalCreateNewGroup}
               startIcon={<UsersPlus />}
@@ -399,8 +397,10 @@ export function BaseLayout() {
                 py: 2,
               }}
             >
-              Add new group{" "}
+              Add new group
             </Button>
+            {loading ? <LoadingSpinner /> : <ConversationList data={data} />}
+            <Box ref={ref} />
           </Grid>
           <Grid item xs={8}>
             <Outlet />

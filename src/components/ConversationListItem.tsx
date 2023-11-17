@@ -53,7 +53,7 @@ export function ConversationListItem({
               </Typography>
               <Typography
                 sx={{
-                  color: match ? "white" : "black",
+                  color: match ? "white" : "#999",
                 }}
               >
                 {format(new Date(createdAt), "hh:mm")}
@@ -65,7 +65,7 @@ export function ConversationListItem({
               ? `${truncate(lastMessage.content, 20)}`
               : `Start a conversation`
           }
-          secondaryTypographyProps={{ color: match ? "white" : "black" }}
+          secondaryTypographyProps={{ color: match ? "white" : "#999" }}
         />
       </ListItemButton>
     </ListItem>

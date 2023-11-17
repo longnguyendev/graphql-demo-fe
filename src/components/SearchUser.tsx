@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Paper } from "@mui/material";
 import { Input, LoadingSpinner, SearchUserList } from ".";
 import {
   GetUsersQueryVariables,
@@ -9,7 +9,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Search } from "@mui/icons-material";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useOnClickOutside } from "usehooks-ts";
 
 const FIRST = 20;
 
@@ -65,8 +66,12 @@ export function SearchUser() {
         }),
     });
 
+  const ref = useRef<HTMLDivElement>(null);
+
+  useOnClickOutside(ref, () => setOpen(false));
+
   return (
-    <Box>
+    <Box position="relative" ref={ref}>
       <Input
         onSubmit={handleSubmit(onSubmit)}
         icon={<Search />}
@@ -74,16 +79,26 @@ export function SearchUser() {
         onFocus={() => {
           setOpen(true);
         }}
-        onBlur={() => {
-          setOpen(false);
-        }}
       />
-      {open &&
-        (loading ? (
+      <Paper
+        sx={{
+          p: 1,
+          position: "absolute",
+          zIndex: 1,
+          left: 0,
+          right: 0,
+          top: open ? 50 : 40,
+          visibility: open ? "visible" : "hidden",
+          opacity: open ? 1 : 0,
+          transition: "all 0.s linear",
+        }}
+      >
+        {loading ? (
           <LoadingSpinner />
         ) : (
           <SearchUserList data={data} onClick={onClick} />
-        ))}
+        )}
+      </Paper>
     </Box>
   );
 }

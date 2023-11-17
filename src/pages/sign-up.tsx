@@ -21,6 +21,7 @@ import { CreateUserInput, Gender } from "@/gql/graphql";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useAuth } from "@/hooks";
 import { Link as RouterLink } from "react-router-dom";
+import { endOfDay } from "date-fns";
 
 interface CreateUserInputValidate extends CreateUserInput {
   rePassword: string;
@@ -55,24 +56,36 @@ const schema = yup
   .object({
     email: yup
       .string()
-      .email("This field must be a Email")
-      .required("Email is required"),
+      .email("Enter valid email")
+      .required("Email is required")
+      .max(255, "Email must not exceed 255 characters"),
     firstName: yup
       .string()
-      .min(4, "less 50 char")
-      .max(50, "ahihihi")
+      .min(2, "First name contains at least 2 characters")
+      .max(50, "First name must not exceed 50 characters")
       .required("First name is required"),
-    lastName: yup.string().required("Last name is required"),
-    password: yup.string().required("Password is required"),
-    dob: yup.date().required("DOB is required"),
+    lastName: yup
+      .string()
+      .required("Last name is required")
+      .min(2, "Last name contains at least 2 characters")
+      .max(20, "Last name must not exceed 20 characters"),
+    password: yup
+      .string()
+      .required("Password is required")
+      .min(6, "Password contains at least 6 characters")
+      .max(255, "Password must not exceed 255 characters"),
+    dob: yup
+      .date()
+      .max(endOfDay(new Date()), "Enter valid birthday")
+      .required("DOB is required"),
     rePassword: yup
       .string()
-      .oneOf([yup.ref("password")], "Passwords do not match")
+      .oneOf([yup.ref("password")], "Not Matching Password")
       .required("Re-password is required"),
     gender: yup
       .mixed<Gender>()
       .oneOf(Object.values(Gender), "Gender is required")
-      .required(),
+      .required("Gender is required"),
   })
   .required();
 
