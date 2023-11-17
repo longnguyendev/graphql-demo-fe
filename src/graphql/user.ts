@@ -6,6 +6,8 @@ export const USER_FRAGMENT = gql`
     email
     name
     lastName
+    dob
+    gender
   }
 `;
 

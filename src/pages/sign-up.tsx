@@ -143,7 +143,7 @@ export function SignUpPage() {
               error={Boolean(errors.email)}
               helperText={errors.email?.message}
               InputLabelProps={{ shrink: true }}
-              placeholder="Enter your email"
+              placeholder="Enter your email dasdsa"
             />
           </Grid>
           <Grid item xs={6}>
@@ -232,7 +232,12 @@ export function SignUpPage() {
           Sign Up
         </Button>
         <Typography component="span">Already have an account? </Typography>
-        <Link component={RouterLink} to="/login" variant="body2">
+        <Link
+          component={RouterLink}
+          to="/login"
+          variant="body2"
+          sx={{ textDecoration: "none" }}
+        >
           Login now
         </Link>
       </Box>

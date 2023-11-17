@@ -1,2 +1,4 @@
-export * from "../icons/Messenger";
-export * from "../icons/Profile";
+export * from "./Messenger";
+export * from "./Profile";
+export * from "./UsersPlus";
+export * from "./users";

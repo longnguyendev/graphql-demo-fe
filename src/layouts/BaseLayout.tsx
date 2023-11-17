@@ -1,5 +1,6 @@
 import { Link, Outlet } from "react-router-dom";
 import {
+  Gender,
   useConversationCreatedSubscription,
   useConversationsQuery,
   useMeQuery,
@@ -28,10 +29,16 @@ import logo from "@/assets/images/logo.png";
 import { Messenger } from "@/assets/icons/Messenger";
 import { useState } from "react";
 import { stringAvatar } from "@/utils";
-import { Profile } from "@/assets/icons";
+import { Profile, Users, UsersPlus } from "@/assets/icons";
 import { DatePicker } from "@mui/x-date-pickers";
 
 const FIRST = 20;
+
+const genders = [
+  { label: "Other", value: Gender.Other },
+  { label: "Male", value: Gender.Male },
+  { label: "Female", value: Gender.Female },
+];
 
 export function BaseLayout() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -43,11 +50,18 @@ export function BaseLayout() {
     setAnchorEl(null);
   };
 
-  const [openModal, setOpenModal] = useState(false);
+  const [openModalProfile, setOpenModalProfile] = useState(false);
   const handleOpenModal = () => {
-    setOpenModal(true), handleClose();
+    setOpenModalProfile(true), handleClose();
   };
-  const handleCloseModal = () => setOpenModal(false);
+  const handleCloseModalProfile = () => setOpenModalProfile(false);
+
+  const [openModalCreateNewGroup, setOpenModalCreateNewGroup] = useState(false);
+  const handleOpenModalCreateNewGroup = () => {
+    setOpenModalCreateNewGroup(true);
+  };
+  const handleCloseModalCreateNewGroup = () =>
+    setOpenModalCreateNewGroup(false);
 
   const { logout } = useAuth();
 
@@ -118,8 +132,8 @@ export function BaseLayout() {
   return (
     <>
       <Modal
-        open={openModal}
-        onClose={handleCloseModal}
+        open={openModalProfile}
+        onClose={handleCloseModalProfile}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
@@ -153,7 +167,7 @@ export function BaseLayout() {
               fullWidth
               margin="normal"
               InputLabelProps={{ shrink: true }}
-              defaultValue="User Name"
+              defaultValue={userData?.me.name}
             />
             <TextField
               label="Bio"
@@ -167,6 +181,7 @@ export function BaseLayout() {
             <DatePicker
               disableFuture
               label="Controlled picker"
+              defaultValue={userData?.me.dob}
               slotProps={{
                 textField: {
                   InputLabelProps: {
@@ -180,15 +195,77 @@ export function BaseLayout() {
             />
             <FormControl fullWidth margin="normal" required>
               <InputLabel>Gender</InputLabel>
-              <Select label="Gender" fullWidth defaultValue="other">
-                <MenuItem value="other">Other</MenuItem>
-                <MenuItem value="male">Male</MenuItem>
-                <MenuItem value="female">Female</MenuItem>
+              <Select
+                label="Gender"
+                fullWidth
+                defaultValue={userData?.me.gender}
+              >
+                {genders.map((gender) => (
+                  <MenuItem key={gender.label} value={gender.label}>
+                    {gender.value}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Box>
           <Button variant="contained" sx={{ marginLeft: "auto" }}>
             Save
+          </Button>
+        </Box>
+      </Modal>
+      <Modal
+        open={openModalCreateNewGroup}
+        onClose={handleCloseModalCreateNewGroup}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 500,
+            height: 600,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <Typography
+            id="modal-modal-title"
+            variant="h6"
+            component="h2"
+            fontWeight="bolder"
+          >
+            Create New Group
+          </Typography>
+
+          <TextField
+            label="Name"
+            margin="normal"
+            placeholder="Enter group name"
+            InputLabelProps={{ shrink: true }}
+          />
+          <TextField
+            label="Search to add members"
+            margin="normal"
+            placeholder="Enter the name of the users you want to add"
+            InputLabelProps={{ shrink: true }}
+          />
+          <TextField
+            label="Membbers"
+            margin="normal"
+            placeholder="Empty"
+            InputLabelProps={{ shrink: true }}
+          />
+          <Button
+            variant="contained"
+            sx={{ marginLeft: "auto", marginTop: "auto" }}
+          >
+            Create
           </Button>
         </Box>
       </Modal>
@@ -218,6 +295,9 @@ export function BaseLayout() {
             })}
           >
             <Messenger />
+          </IconButton>
+          <IconButton>
+            <Users />
           </IconButton>
 
           {userData && (
@@ -308,6 +388,19 @@ export function BaseLayout() {
             <SearchUser />
             {loading ? <LoadingSpinner /> : <ConversationList data={data} />}
             <Box ref={ref} />
+            <Button
+              onClick={handleOpenModalCreateNewGroup}
+              startIcon={<UsersPlus />}
+              sx={{
+                color: "#727375",
+                width: "100%",
+                border: "1px solid #eee",
+                bgcolor: "white",
+                py: 2,
+              }}
+            >
+              Add new group{" "}
+            </Button>
           </Grid>
           <Grid item xs={8}>
             <Outlet />

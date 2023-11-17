@@ -265,14 +265,14 @@ export type CreateConversationMutationVariables = Exact<{
 
 export type CreateConversationMutation = { __typename?: 'Mutation', createConversation: { __typename?: 'Conversation', id: number, name: string, createdAt: any, updatedAt: any, lastMessage?: { __typename?: 'Message', content: string, createdAt: any } | null } };
 
-export type MessageDataFragment = { __typename?: 'Message', id: number, content: string, createdAt: any, sender: { __typename?: 'User', id: number, email: string, name: string, lastName: string }, conversation: { __typename?: 'Conversation', id: number } };
+export type MessageDataFragment = { __typename?: 'Message', id: number, content: string, createdAt: any, sender: { __typename?: 'User', id: number, email: string, name: string, lastName: string, dob: any, gender: Gender }, conversation: { __typename?: 'Conversation', id: number } };
 
 export type MessageCreatedSubscriptionVariables = Exact<{
   conversationId?: InputMaybe<Scalars['Float']['input']>;
 }>;
 
 
-export type MessageCreatedSubscription = { __typename?: 'Subscription', messageCreated: { __typename?: 'Message', id: number, content: string, createdAt: any, sender: { __typename?: 'User', id: number, email: string, name: string, lastName: string }, conversation: { __typename?: 'Conversation', id: number } } };
+export type MessageCreatedSubscription = { __typename?: 'Subscription', messageCreated: { __typename?: 'Message', id: number, content: string, createdAt: any, sender: { __typename?: 'User', id: number, email: string, name: string, lastName: string, dob: any, gender: Gender }, conversation: { __typename?: 'Conversation', id: number } } };
 
 export type MessagesQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Float']['input']>;
@@ -281,21 +281,21 @@ export type MessagesQueryVariables = Exact<{
 }>;
 
 
-export type MessagesQuery = { __typename?: 'Query', messages: { __typename?: 'PaginatedMessage', totalCount: number, nextCursor?: string | null, nodes?: Array<{ __typename?: 'Message', id: number, content: string, createdAt: any, sender: { __typename?: 'User', id: number, email: string, name: string, lastName: string }, conversation: { __typename?: 'Conversation', id: number } }> | null } };
+export type MessagesQuery = { __typename?: 'Query', messages: { __typename?: 'PaginatedMessage', totalCount: number, nextCursor?: string | null, nodes?: Array<{ __typename?: 'Message', id: number, content: string, createdAt: any, sender: { __typename?: 'User', id: number, email: string, name: string, lastName: string, dob: any, gender: Gender }, conversation: { __typename?: 'Conversation', id: number } }> | null } };
 
 export type CreateMessageMutationVariables = Exact<{
   createMessageInput: CreateMessageInput;
 }>;
 
 
-export type CreateMessageMutation = { __typename?: 'Mutation', createMessage: { __typename?: 'Message', id: number, content: string, createdAt: any, sender: { __typename?: 'User', id: number, email: string, name: string, lastName: string }, conversation: { __typename?: 'Conversation', id: number } } };
+export type CreateMessageMutation = { __typename?: 'Mutation', createMessage: { __typename?: 'Message', id: number, content: string, createdAt: any, sender: { __typename?: 'User', id: number, email: string, name: string, lastName: string, dob: any, gender: Gender }, conversation: { __typename?: 'Conversation', id: number } } };
 
-export type UserDataFragment = { __typename?: 'User', id: number, email: string, name: string, lastName: string };
+export type UserDataFragment = { __typename?: 'User', id: number, email: string, name: string, lastName: string, dob: any, gender: Gender };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', id: number, email: string, name: string, lastName: string } };
+export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', id: number, email: string, name: string, lastName: string, dob: any, gender: Gender } };
 
 export type GetUsersQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Float']['input']>;
@@ -304,7 +304,7 @@ export type GetUsersQueryVariables = Exact<{
 }>;
 
 
-export type GetUsersQuery = { __typename?: 'Query', users: { __typename?: 'PaginatedUser', totalCount: number, nextCursor?: string | null, nodes?: Array<{ __typename?: 'User', id: number, email: string, name: string, lastName: string }> | null } };
+export type GetUsersQuery = { __typename?: 'Query', users: { __typename?: 'PaginatedUser', totalCount: number, nextCursor?: string | null, nodes?: Array<{ __typename?: 'User', id: number, email: string, name: string, lastName: string, dob: any, gender: Gender }> | null } };
 
 export const AuthDataFragmentDoc = gql`
     fragment AuthData on Auth {
@@ -329,6 +329,8 @@ export const UserDataFragmentDoc = gql`
   email
   name
   lastName
+  dob
+  gender
 }
     `;
 export const MessageDataFragmentDoc = gql`
