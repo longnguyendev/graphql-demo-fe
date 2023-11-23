@@ -1,4 +1,5 @@
 import {
+  Alert,
   Box,
   Button,
   FormHelperText,
@@ -22,6 +23,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useAuth } from "@/hooks";
 import { Link as RouterLink } from "react-router-dom";
 import { endOfDay } from "date-fns";
+import { useState } from "react";
 
 interface CreateUserInputValidate extends CreateUserInput {
   rePassword: string;
@@ -52,6 +54,8 @@ const defaultValues: CreateUserInputValidate = {
   gender: Gender.Other,
 };
 
+const regex = /^[\p{L}\s]+$/u;
+
 const schema = yup
   .object({
     email: yup
@@ -62,16 +66,18 @@ const schema = yup
       .max(255, "Email must not exceed 255 characters"),
     firstName: yup
       .string()
-      .trim()
+      .trim("First name contains at least 2 characters")
       .min(2, "First name contains at least 2 characters")
       .max(50, "First name must not exceed 50 characters")
+      .matches(regex, "Enter valid fist name")
       .required("First name is required"),
     lastName: yup
       .string()
-      .trim()
-      .required("Last name is required")
+      .trim("Last name contains at least 2 characters")
       .min(2, "Last name contains at least 2 characters")
-      .max(20, "Last name must not exceed 20 characters"),
+      .max(20, "Last name must not exceed 20 characters")
+      .matches(regex, "Enter valid last name")
+      .required("Last name is required"),
     password: yup
       .string()
       .trim()
@@ -104,7 +110,9 @@ export function SignUpPage() {
     defaultValues,
   });
 
-  const { signUp } = useAuth();
+  const [error, setError] = useState("");
+
+  const { signUp } = useAuth({ onError: ({ message }) => setError(message) });
 
   const onSubmit: SubmitHandler<CreateUserInputValidate> = ({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -116,6 +124,7 @@ export function SignUpPage() {
       <Typography component="h1" variant="h5" textAlign="center" mb={4}>
         Sign Up
       </Typography>
+      {error && <Alert severity="error">{error}</Alert>}
       <Box
         component="form"
         noValidate

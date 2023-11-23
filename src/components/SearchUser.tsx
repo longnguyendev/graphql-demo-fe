@@ -9,8 +9,9 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Search } from "@mui/icons-material";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useOnClickOutside } from "usehooks-ts";
+import { useInfinityScroll } from "@/hooks";
 
 const FIRST = 20;
 
@@ -30,7 +31,21 @@ export function SearchUser() {
     defaultValues,
   });
 
-  const [getUser, { data, updateQuery, loading }] = useGetUsersLazyQuery();
+  const [getUser, { data, updateQuery, fetchMore, loading }] =
+    useGetUsersLazyQuery();
+
+  const fetchNextPage = useCallback(() => {
+    if (data?.users.nextCursor) {
+      fetchMore({
+        variables: {
+          first: FIRST,
+          after: data.users.nextCursor,
+        },
+      });
+    }
+  }, [data?.users.nextCursor, fetchMore]);
+
+  const listRef = useInfinityScroll(fetchNextPage);
 
   const [createConversation] = useCreateConversationMutation();
 
@@ -76,6 +91,7 @@ export function SearchUser() {
         onSubmit={handleSubmit(onSubmit)}
         icon={<Search />}
         {...register("search")}
+        placeholder="Enter email"
         onFocus={() => {
           setOpen(true);
         }}
@@ -91,6 +107,8 @@ export function SearchUser() {
           visibility: open ? "visible" : "hidden",
           opacity: open ? 1 : 0,
           transition: "all 0.s linear",
+          maxHeight: 300,
+          overflowX: "auto",
         }}
       >
         {loading ? (
@@ -98,6 +116,7 @@ export function SearchUser() {
         ) : (
           <SearchUserList data={data} onClick={onClick} />
         )}
+        <Box ref={listRef} />
       </Paper>
     </Box>
   );

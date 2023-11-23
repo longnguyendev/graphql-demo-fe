@@ -1,5 +1,5 @@
 import { ConversationDataFragment } from "@/gql/graphql";
-import { stringAvatar, truncate } from "@/utils";
+import { stringToColor, truncate } from "@/utils";
 import {
   Avatar,
   Box,
@@ -36,9 +36,14 @@ export function ConversationListItem({
       >
         <ListItemAvatar>
           <Avatar
-            {...stringAvatar(name)}
-            sx={{ width: "50px", height: "50px" }}
-          />
+            sx={{
+              bgcolor: stringToColor(name),
+              width: "50px",
+              height: "50px",
+            }}
+          >
+            {name[0]}
+          </Avatar>
         </ListItemAvatar>
         <ListItemText
           primary={

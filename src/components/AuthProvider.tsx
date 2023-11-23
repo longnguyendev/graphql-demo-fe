@@ -25,6 +25,10 @@ const cache = new InMemoryCache({
           keyArgs: ["conversationId"],
           merge,
         },
+        users: {
+          keyArgs: ["search"],
+          merge,
+        },
         conversations: {
           keyArgs: false,
           merge,
