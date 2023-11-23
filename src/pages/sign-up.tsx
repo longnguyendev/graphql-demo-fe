@@ -56,21 +56,25 @@ const schema = yup
   .object({
     email: yup
       .string()
+      .trim()
       .email("Enter valid email")
       .required("Email is required")
       .max(255, "Email must not exceed 255 characters"),
     firstName: yup
       .string()
+      .trim()
       .min(2, "First name contains at least 2 characters")
       .max(50, "First name must not exceed 50 characters")
       .required("First name is required"),
     lastName: yup
       .string()
+      .trim()
       .required("Last name is required")
       .min(2, "Last name contains at least 2 characters")
       .max(20, "Last name must not exceed 20 characters"),
     password: yup
       .string()
+      .trim()
       .required("Password is required")
       .min(6, "Password contains at least 6 characters")
       .max(255, "Password must not exceed 255 characters"),
