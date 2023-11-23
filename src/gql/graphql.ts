@@ -51,6 +51,7 @@ export type CreateMessageInput = {
 };
 
 export type CreateUserInput = {
+  bio?: InputMaybe<Scalars['String']['input']>;
   dob: Scalars['Date']['input'];
   email: Scalars['String']['input'];
   firstName: Scalars['String']['input'];
@@ -94,6 +95,7 @@ export type Mutation = {
   removeConversation: Conversation;
   removeMessage: Message;
   signUp: Auth;
+  updateUser: User;
 };
 
 
@@ -124,6 +126,11 @@ export type MutationRemoveMessageArgs = {
 
 export type MutationSignUpArgs = {
   signUpInput: CreateUserInput;
+};
+
+
+export type MutationUpdateUserArgs = {
+  updateUserInput: UpdateUserInput;
 };
 
 export type PaginatedConversation = {
@@ -201,9 +208,17 @@ export type SubscriptionMessageCreatedArgs = {
   conversationId?: InputMaybe<Scalars['Float']['input']>;
 };
 
+export type UpdateUserInput = {
+  bio?: InputMaybe<Scalars['String']['input']>;
+  dob?: InputMaybe<Scalars['Date']['input']>;
+  firstName?: InputMaybe<Scalars['String']['input']>;
+  gender?: InputMaybe<Gender>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type User = {
   __typename?: 'User';
-  bio: Scalars['String']['output'];
+  bio?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['Date']['output'];
   dob: Scalars['Date']['output'];
   email: Scalars['String']['output'];
@@ -266,14 +281,14 @@ export type CreateConversationMutationVariables = Exact<{
 
 export type CreateConversationMutation = { __typename?: 'Mutation', createConversation: { __typename?: 'Conversation', id: number, name: string, createdAt: any, updatedAt: any, lastMessage?: { __typename?: 'Message', content: string, createdAt: any } | null } };
 
-export type MessageDataFragment = { __typename?: 'Message', id: number, content: string, createdAt: any, sender: { __typename?: 'User', id: number, email: string, name: string, lastName: string, dob: any, gender: Gender }, conversation: { __typename?: 'Conversation', id: number } };
+export type MessageDataFragment = { __typename?: 'Message', id: number, content: string, createdAt: any, sender: { __typename?: 'User', id: number, email: string, name: string, lastName: string, firstName: string, dob: any, gender: Gender, bio?: string | null }, conversation: { __typename?: 'Conversation', id: number } };
 
 export type MessageCreatedSubscriptionVariables = Exact<{
   conversationId?: InputMaybe<Scalars['Float']['input']>;
 }>;
 
 
-export type MessageCreatedSubscription = { __typename?: 'Subscription', messageCreated: { __typename?: 'Message', id: number, content: string, createdAt: any, sender: { __typename?: 'User', id: number, email: string, name: string, lastName: string, dob: any, gender: Gender }, conversation: { __typename?: 'Conversation', id: number } } };
+export type MessageCreatedSubscription = { __typename?: 'Subscription', messageCreated: { __typename?: 'Message', id: number, content: string, createdAt: any, sender: { __typename?: 'User', id: number, email: string, name: string, lastName: string, firstName: string, dob: any, gender: Gender, bio?: string | null }, conversation: { __typename?: 'Conversation', id: number } } };
 
 export type MessagesQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Float']['input']>;
@@ -282,21 +297,21 @@ export type MessagesQueryVariables = Exact<{
 }>;
 
 
-export type MessagesQuery = { __typename?: 'Query', messages: { __typename?: 'PaginatedMessage', totalCount: number, nextCursor?: string | null, nodes?: Array<{ __typename?: 'Message', id: number, content: string, createdAt: any, sender: { __typename?: 'User', id: number, email: string, name: string, lastName: string, dob: any, gender: Gender }, conversation: { __typename?: 'Conversation', id: number } }> | null } };
+export type MessagesQuery = { __typename?: 'Query', messages: { __typename?: 'PaginatedMessage', totalCount: number, nextCursor?: string | null, nodes?: Array<{ __typename?: 'Message', id: number, content: string, createdAt: any, sender: { __typename?: 'User', id: number, email: string, name: string, lastName: string, firstName: string, dob: any, gender: Gender, bio?: string | null }, conversation: { __typename?: 'Conversation', id: number } }> | null } };
 
 export type CreateMessageMutationVariables = Exact<{
   createMessageInput: CreateMessageInput;
 }>;
 
 
-export type CreateMessageMutation = { __typename?: 'Mutation', createMessage: { __typename?: 'Message', id: number, content: string, createdAt: any, sender: { __typename?: 'User', id: number, email: string, name: string, lastName: string, dob: any, gender: Gender }, conversation: { __typename?: 'Conversation', id: number } } };
+export type CreateMessageMutation = { __typename?: 'Mutation', createMessage: { __typename?: 'Message', id: number, content: string, createdAt: any, sender: { __typename?: 'User', id: number, email: string, name: string, lastName: string, firstName: string, dob: any, gender: Gender, bio?: string | null }, conversation: { __typename?: 'Conversation', id: number } } };
 
-export type UserDataFragment = { __typename?: 'User', id: number, email: string, name: string, lastName: string, dob: any, gender: Gender };
+export type UserDataFragment = { __typename?: 'User', id: number, email: string, name: string, lastName: string, firstName: string, dob: any, gender: Gender, bio?: string | null };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', id: number, email: string, name: string, lastName: string, dob: any, gender: Gender } };
+export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', id: number, email: string, name: string, lastName: string, firstName: string, dob: any, gender: Gender, bio?: string | null } };
 
 export type GetUsersQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Float']['input']>;
@@ -305,7 +320,14 @@ export type GetUsersQueryVariables = Exact<{
 }>;
 
 
-export type GetUsersQuery = { __typename?: 'Query', users: { __typename?: 'PaginatedUser', totalCount: number, nextCursor?: string | null, nodes?: Array<{ __typename?: 'User', id: number, email: string, name: string, lastName: string, dob: any, gender: Gender }> | null } };
+export type GetUsersQuery = { __typename?: 'Query', users: { __typename?: 'PaginatedUser', totalCount: number, nextCursor?: string | null, nodes?: Array<{ __typename?: 'User', id: number, email: string, name: string, lastName: string, firstName: string, dob: any, gender: Gender, bio?: string | null }> | null } };
+
+export type UpdateUserMutationVariables = Exact<{
+  updateUserInput: UpdateUserInput;
+}>;
+
+
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: number, email: string, name: string, lastName: string, firstName: string, dob: any, gender: Gender, bio?: string | null } };
 
 export const AuthDataFragmentDoc = gql`
     fragment AuthData on Auth {
@@ -330,8 +352,10 @@ export const UserDataFragmentDoc = gql`
   email
   name
   lastName
+  firstName
   dob
   gender
+  bio
 }
     `;
 export const MessageDataFragmentDoc = gql`
@@ -729,3 +753,36 @@ export function useGetUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<G
 export type GetUsersQueryHookResult = ReturnType<typeof useGetUsersQuery>;
 export type GetUsersLazyQueryHookResult = ReturnType<typeof useGetUsersLazyQuery>;
 export type GetUsersQueryResult = Apollo.QueryResult<GetUsersQuery, GetUsersQueryVariables>;
+export const UpdateUserDocument = gql`
+    mutation UpdateUser($updateUserInput: UpdateUserInput!) {
+  updateUser(updateUserInput: $updateUserInput) {
+    ...UserData
+  }
+}
+    ${UserDataFragmentDoc}`;
+export type UpdateUserMutationFn = Apollo.MutationFunction<UpdateUserMutation, UpdateUserMutationVariables>;
+
+/**
+ * __useUpdateUserMutation__
+ *
+ * To run a mutation, you first call `useUpdateUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateUserMutation, { data, loading, error }] = useUpdateUserMutation({
+ *   variables: {
+ *      updateUserInput: // value for 'updateUserInput'
+ *   },
+ * });
+ */
+export function useUpdateUserMutation(baseOptions?: Apollo.MutationHookOptions<UpdateUserMutation, UpdateUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateUserMutation, UpdateUserMutationVariables>(UpdateUserDocument, options);
+      }
+export type UpdateUserMutationHookResult = ReturnType<typeof useUpdateUserMutation>;
+export type UpdateUserMutationResult = Apollo.MutationResult<UpdateUserMutation>;
+export type UpdateUserMutationOptions = Apollo.BaseMutationOptions<UpdateUserMutation, UpdateUserMutationVariables>;

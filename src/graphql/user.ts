@@ -6,8 +6,10 @@ export const USER_FRAGMENT = gql`
     email
     name
     lastName
+    firstName
     dob
     gender
+    bio
   }
 `;
 
@@ -27,6 +29,14 @@ export const GET_USERS = gql`
       }
       totalCount
       nextCursor
+    }
+  }
+`;
+
+export const UP_DATE_USER = gql`
+  mutation UpdateUser($updateUserInput: UpdateUserInput!) {
+    updateUser(updateUserInput: $updateUserInput) {
+      ...UserData
     }
   }
 `;

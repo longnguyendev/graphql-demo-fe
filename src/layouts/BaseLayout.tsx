@@ -1,16 +1,22 @@
 import { Link, Outlet } from "react-router-dom";
 import {
   Gender,
+  MeDocument,
+  MeQuery,
+  MeQueryVariables,
+  UpdateUserInput,
   useConversationCreatedSubscription,
   useConversationsQuery,
   useMeQuery,
   useMessageCreatedSubscription,
+  useUpdateUserMutation,
 } from "@/gql/graphql";
 import {
   Avatar,
   Box,
   Button,
   FormControl,
+  FormHelperText,
   Grid,
   IconButton,
   InputLabel,
@@ -31,16 +37,44 @@ import { useState } from "react";
 import { stringAvatar } from "@/utils";
 import { Profile, Users, UsersPlus } from "@/assets/icons";
 import { DatePicker } from "@mui/x-date-pickers";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { endOfDay } from "date-fns";
+import { options } from "@/pages";
+import { useApolloClient } from "@apollo/client";
 
 const FIRST = 20;
 
-const genders = [
-  { label: "Other", value: Gender.Other },
-  { label: "Male", value: Gender.Male },
-  { label: "Female", value: Gender.Female },
-];
+const schema = yup
+  .object({
+    firstName: yup
+      .string()
+      .trim()
+      .min(2, "First name contains at least 2 characters")
+      .max(50, "First name must not exceed 50 characters")
+      .nullable(),
+    lastName: yup
+      .string()
+      .trim()
+
+      .min(2, "Last name contains at least 2 characters")
+      .max(20, "Last name must not exceed 20 characters")
+      .nullable(),
+    dob: yup
+      .date()
+      .max(endOfDay(new Date()), "Enter valid birthday")
+      .nullable(),
+    gender: yup
+      .mixed<Gender>()
+      .oneOf(Object.values(Gender), "Gender is required")
+      .nullable(),
+    bio: yup.string().max(200, "Bio must not exceed 200 characters").nullable(),
+  })
+  .required();
 
 export function BaseLayout() {
+  const client = useApolloClient();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -66,6 +100,33 @@ export function BaseLayout() {
   const { logout } = useAuth();
 
   const { data: userData } = useMeQuery();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    control,
+  } = useForm<UpdateUserInput>({
+    resolver: yupResolver(schema),
+    defaultValues: async () =>
+      await client
+        .query<MeQuery, MeQueryVariables>({
+          query: MeDocument,
+        })
+        .then(({ data }) =>
+          data?.me
+            ? {
+                firstName: data.me.firstName,
+                lastName: data.me.lastName,
+                dob: data.me.dob,
+                bio: data.me.bio,
+                gender: data.me.gender,
+              }
+            : {}
+        ),
+  });
+
+  const [update] = useUpdateUserMutation();
 
   const { data, updateQuery, loading, fetchMore } = useConversationsQuery();
 
@@ -129,6 +190,9 @@ export function BaseLayout() {
     },
   });
 
+  const onSubmit: SubmitHandler<UpdateUserInput> = (updateUserInput) =>
+    update({ variables: { updateUserInput } });
+
   return (
     <>
       <Modal
@@ -138,6 +202,8 @@ export function BaseLayout() {
         aria-describedby="modal-modal-description"
       >
         <Box
+          component="form"
+          onSubmit={handleSubmit(onSubmit)}
           sx={{
             display: "flex",
             flexDirection: "column",
@@ -161,54 +227,85 @@ export function BaseLayout() {
             Profile
           </Typography>
           <Avatar sx={{ margin: "auto", height: "120px", width: "120px" }} />
-          <Box component="form">
-            <TextField
-              label="name"
-              fullWidth
-              margin="normal"
-              InputLabelProps={{ shrink: true }}
-              defaultValue={userData?.me.name}
-            />
-            <TextField
-              label="Bio"
-              multiline={true}
-              rows={3}
-              fullWidth
-              margin="normal"
-              InputLabelProps={{ shrink: true }}
-              defaultValue="chưa cập nhật"
-            />
-            <DatePicker
-              disableFuture
-              label="Controlled picker"
-              defaultValue={userData?.me.dob}
-              slotProps={{
-                textField: {
-                  InputLabelProps: {
-                    shrink: true,
-                  },
+          <TextField
+            margin="normal"
+            autoComplete="given-name"
+            required
+            fullWidth
+            label="First Name"
+            autoFocus
+            {...register("firstName")}
+            error={Boolean(errors.firstName)}
+            helperText={errors.firstName?.message}
+            InputLabelProps={{ shrink: true }}
+            placeholder="Enter your first name"
+          />
 
-                  fullWidth: true,
-                },
-              }}
-              sx={{ my: "15px" }}
-            />
-            <FormControl fullWidth margin="normal" required>
-              <InputLabel>Gender</InputLabel>
-              <Select
-                label="Gender"
-                fullWidth
-                defaultValue={userData?.me.gender}
-              >
-                {genders.map((gender) => (
-                  <MenuItem key={gender.label} value={gender.label}>
-                    {gender.value}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-          <Button variant="contained" sx={{ marginLeft: "auto" }}>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            label="Last Name"
+            autoComplete="family-name"
+            {...register("lastName")}
+            error={Boolean(errors.lastName)}
+            helperText={errors.lastName?.message}
+            InputLabelProps={{ shrink: true }}
+            placeholder="Enter your last name"
+          />
+
+          <TextField
+            margin="normal"
+            label="Bio"
+            multiline={true}
+            rows={3}
+            fullWidth
+            autoComplete="family-name"
+            {...register("bio")}
+            error={Boolean(errors.bio)}
+            helperText={errors.bio?.message}
+            InputLabelProps={{ shrink: true }}
+            placeholder="Enter your bio"
+          />
+          <Controller
+            name="dob"
+            control={control}
+            render={({ field }) => (
+              <DatePicker
+                disableFuture
+                label="Controlled picker"
+                slotProps={{
+                  textField: {
+                    error: Boolean(errors.dob),
+                    InputLabelProps: {
+                      shrink: true,
+                    },
+                    helperText: errors.dob?.message?.toString(),
+                    fullWidth: true,
+                  },
+                }}
+                {...field}
+              />
+            )}
+          />
+          <Controller
+            name="gender"
+            control={control}
+            render={({ field }) => (
+              <FormControl fullWidth required error={Boolean(errors.gender)}>
+                <InputLabel shrink>Gender</InputLabel>
+                <Select label="Gender" fullWidth {...field}>
+                  {options.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+                <FormHelperText>{errors.gender?.message}</FormHelperText>
+              </FormControl>
+            )}
+          />
+          <Button type="submit" variant="contained" sx={{ marginLeft: "auto" }}>
             Save
           </Button>
         </Box>
@@ -299,7 +396,6 @@ export function BaseLayout() {
           <IconButton>
             <Users />
           </IconButton>
-
           {userData && (
             <>
               <IconButton onClick={handleClick} sx={{ mt: "auto" }}>

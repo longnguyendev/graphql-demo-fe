@@ -27,7 +27,7 @@ interface CreateUserInputValidate extends CreateUserInput {
   rePassword: string;
 }
 
-const options = [
+export const options = [
   {
     label: "Other",
     value: Gender.Other,
