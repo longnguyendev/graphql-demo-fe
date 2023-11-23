@@ -22,7 +22,7 @@ import { CreateUserInput, Gender } from "@/gql/graphql";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useAuth } from "@/hooks";
 import { Link as RouterLink } from "react-router-dom";
-import { endOfDay } from "date-fns";
+import { endOfDay, subYears } from "date-fns";
 import { useState } from "react";
 
 interface CreateUserInputValidate extends CreateUserInput {
@@ -86,6 +86,7 @@ const schema = yup
       .max(255, "Password must not exceed 255 characters"),
     dob: yup
       .date()
+      .min(subYears(new Date(), 200))
       .max(endOfDay(new Date()), "Enter valid birthday")
       .required("DOB is required"),
     rePassword: yup
