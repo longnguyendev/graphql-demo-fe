@@ -91,6 +91,8 @@ export function ProfileModal({ open, onClose }: ProfileModalProps) {
   });
 
   const onSubmit: SubmitHandler<UpdateUserInput> = (updateUserInput) => {
+    updateUserInput.firstName = updateUserInput.firstName?.trim();
+    updateUserInput.lastName = updateUserInput.lastName?.trim();
     updateUserInput.bio = updateUserInput.bio?.trim();
     update({ variables: { updateUserInput } });
   };
