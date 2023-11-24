@@ -91,7 +91,7 @@ export function SearchUser() {
         onSubmit={handleSubmit(onSubmit)}
         icon={<Search />}
         {...register("search")}
-        placeholder="Enter email"
+        placeholder="Enter name"
         onFocus={() => {
           setOpen(true);
         }}
