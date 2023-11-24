@@ -25,16 +25,20 @@ import { endOfDay, subYears } from "date-fns";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
 
+export const regex = /^[\p{L}\s]+$/u;
+
 const schema = yup
   .object({
     firstName: yup
       .string()
+      .matches(regex, "Enter valid first name")
       .trim()
       .min(2, "First name contains at least 2 characters")
       .max(50, "First name must not exceed 50 characters")
       .nullable(),
     lastName: yup
       .string()
+      .matches(regex, "Enter valid last name")
       .trim()
       .min(2, "Last name contains at least 2 characters")
       .max(20, "Last name must not exceed 20 characters")

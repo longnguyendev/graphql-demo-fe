@@ -67,13 +67,14 @@ const schema = yup
     firstName: yup
       .string()
       .trim("First name contains at least 2 characters")
+      .matches(regex, "Enter valid first name")
       .min(2, "First name contains at least 2 characters")
       .max(50, "First name must not exceed 50 characters")
-      .matches(regex, "Enter valid fist name")
       .required("First name is required"),
     lastName: yup
       .string()
       .trim("Last name contains at least 2 characters")
+      .matches(regex, "Enter valid last name")
       .min(2, "Last name contains at least 2 characters")
       .max(20, "Last name must not exceed 20 characters")
       .matches(regex, "Enter valid last name")

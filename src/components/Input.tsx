@@ -22,7 +22,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       component="form"
       onSubmit={onSubmit}
     >
-      <InputBase ref={ref} fullWidth autoComplete="off" {...props} />
+      <InputBase
+        ref={ref}
+        fullWidth
+        autoComplete="off"
+        {...props}
+        inputProps={{ maxLength: 1000 }}
+      />
       <IconButton type="submit">{icon}</IconButton>
     </Box>
   )
