@@ -21,7 +21,7 @@ import {
   Typography,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
-import { endOfDay } from "date-fns";
+import { endOfDay, subYears } from "date-fns";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
 
@@ -36,12 +36,12 @@ const schema = yup
     lastName: yup
       .string()
       .trim()
-
       .min(2, "Last name contains at least 2 characters")
       .max(20, "Last name must not exceed 20 characters")
       .nullable(),
     dob: yup
       .date()
+      .min(subYears(new Date(), 200), "Enter valid dob")
       .max(endOfDay(new Date()), "Enter valid birthday")
       .nullable(),
     gender: yup
@@ -90,8 +90,10 @@ export function ProfileModal({ open, onClose }: ProfileModalProps) {
     },
   });
 
-  const onSubmit: SubmitHandler<UpdateUserInput> = (updateUserInput) =>
+  const onSubmit: SubmitHandler<UpdateUserInput> = (updateUserInput) => {
+    updateUserInput.bio = updateUserInput.bio?.trim();
     update({ variables: { updateUserInput } });
+  };
 
   return (
     <Modal
@@ -171,8 +173,9 @@ export function ProfileModal({ open, onClose }: ProfileModalProps) {
           control={control}
           render={({ field }) => (
             <DatePicker
+              sx={{ my: 2 }}
               disableFuture
-              label="Controlled picker"
+              label="Dob"
               slotProps={{
                 textField: {
                   error: Boolean(errors.dob),
@@ -191,7 +194,12 @@ export function ProfileModal({ open, onClose }: ProfileModalProps) {
           name="gender"
           control={control}
           render={({ field }) => (
-            <FormControl fullWidth required error={Boolean(errors.gender)}>
+            <FormControl
+              sx={{ my: 1 }}
+              fullWidth
+              required
+              error={Boolean(errors.gender)}
+            >
               <InputLabel shrink>Gender</InputLabel>
               <Select label="Gender" fullWidth {...field}>
                 {options.map((option) => (
@@ -204,7 +212,11 @@ export function ProfileModal({ open, onClose }: ProfileModalProps) {
             </FormControl>
           )}
         />
-        <Button type="submit" variant="contained" sx={{ marginLeft: "auto" }}>
+        <Button
+          type="submit"
+          variant="contained"
+          sx={{ marginLeft: "auto", mt: 4 }}
+        >
           Save
         </Button>
       </Box>
