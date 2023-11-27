@@ -165,6 +165,7 @@ export type Query = {
   message: Message;
   messages: PaginatedMessage;
   users: PaginatedUser;
+  usersNotMe: PaginatedUser;
 };
 
 
@@ -192,6 +193,13 @@ export type QueryMessagesArgs = {
 
 
 export type QueryUsersArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Float']['input']>;
+  search?: Scalars['String']['input'];
+};
+
+
+export type QueryUsersNotMeArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Float']['input']>;
   search?: Scalars['String']['input'];
@@ -328,6 +336,15 @@ export type UpdateUserMutationVariables = Exact<{
 
 
 export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: number, email: string, name: string, lastName: string, firstName: string, dob: any, gender: Gender, bio?: string | null } };
+
+export type GetUsersNotMeQueryVariables = Exact<{
+  first?: InputMaybe<Scalars['Float']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type GetUsersNotMeQuery = { __typename?: 'Query', usersNotMe: { __typename?: 'PaginatedUser', totalCount: number, nextCursor?: string | null, nodes?: Array<{ __typename?: 'User', id: number, email: string, name: string, lastName: string, firstName: string, dob: any, gender: Gender, bio?: string | null }> | null } };
 
 export const AuthDataFragmentDoc = gql`
     fragment AuthData on Auth {
@@ -786,3 +803,44 @@ export function useUpdateUserMutation(baseOptions?: Apollo.MutationHookOptions<U
 export type UpdateUserMutationHookResult = ReturnType<typeof useUpdateUserMutation>;
 export type UpdateUserMutationResult = Apollo.MutationResult<UpdateUserMutation>;
 export type UpdateUserMutationOptions = Apollo.BaseMutationOptions<UpdateUserMutation, UpdateUserMutationVariables>;
+export const GetUsersNotMeDocument = gql`
+    query GetUsersNotMe($first: Float, $after: String, $search: String) {
+  usersNotMe(first: $first, after: $after, search: $search) {
+    nodes {
+      ...UserData
+    }
+    totalCount
+    nextCursor
+  }
+}
+    ${UserDataFragmentDoc}`;
+
+/**
+ * __useGetUsersNotMeQuery__
+ *
+ * To run a query within a React component, call `useGetUsersNotMeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUsersNotMeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUsersNotMeQuery({
+ *   variables: {
+ *      first: // value for 'first'
+ *      after: // value for 'after'
+ *      search: // value for 'search'
+ *   },
+ * });
+ */
+export function useGetUsersNotMeQuery(baseOptions?: Apollo.QueryHookOptions<GetUsersNotMeQuery, GetUsersNotMeQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUsersNotMeQuery, GetUsersNotMeQueryVariables>(GetUsersNotMeDocument, options);
+      }
+export function useGetUsersNotMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUsersNotMeQuery, GetUsersNotMeQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUsersNotMeQuery, GetUsersNotMeQueryVariables>(GetUsersNotMeDocument, options);
+        }
+export type GetUsersNotMeQueryHookResult = ReturnType<typeof useGetUsersNotMeQuery>;
+export type GetUsersNotMeLazyQueryHookResult = ReturnType<typeof useGetUsersNotMeLazyQuery>;
+export type GetUsersNotMeQueryResult = Apollo.QueryResult<GetUsersNotMeQuery, GetUsersNotMeQueryVariables>;

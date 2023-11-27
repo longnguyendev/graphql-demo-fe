@@ -40,3 +40,15 @@ export const UP_DATE_USER = gql`
     }
   }
 `;
+
+export const GET_USERS_NOT_ME = gql`
+  query GetUsersNotMe($first: Float, $after: String, $search: String) {
+    usersNotMe(first: $first, after: $after, search: $search) {
+      nodes {
+        ...UserData
+      }
+      totalCount
+      nextCursor
+    }
+  }
+`;

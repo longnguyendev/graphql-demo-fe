@@ -8,27 +8,22 @@ import {
 import {
   Avatar,
   Box,
-  Button,
-  Grid,
   IconButton,
   ListItemIcon,
   Menu,
   MenuItem,
-  Modal,
-  TextField,
   Typography,
 } from "@mui/material";
 import { Logout } from "@mui/icons-material";
-import { useAuth, useInfinityScroll } from "@/hooks";
-import { ConversationList, LoadingSpinner, SearchUser } from "@/components";
+import { useAuth } from "@/hooks";
 import logo from "@/assets/images/logo.png";
 import { Messenger } from "@/assets/icons/Messenger";
 import { useState } from "react";
 import { stringAvatar } from "@/utils";
-import { Profile, Users, UsersPlus } from "@/assets/icons";
+import { Profile, Users } from "@/assets/icons";
 import { ProfileModal } from "@/components/ProfileModal";
 
-const FIRST = 20;
+import "../index.css";
 
 export function BaseLayout() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -45,31 +40,11 @@ export function BaseLayout() {
     setOpenProfile(true);
   };
 
-  const [openModalCreateNewGroup, setOpenModalCreateNewGroup] = useState(false);
-  const handleOpenModalCreateNewGroup = () => {
-    setOpenModalCreateNewGroup(true);
-  };
-  const handleCloseModalCreateNewGroup = () =>
-    setOpenModalCreateNewGroup(false);
-
   const { logout } = useAuth();
 
   const { data: userData } = useMeQuery();
 
-  const { data, updateQuery, loading, fetchMore } = useConversationsQuery();
-
-  const fetchNextPage = () => {
-    if (data?.conversations.nextCursor) {
-      fetchMore({
-        variables: {
-          first: FIRST,
-          after: data.conversations.nextCursor,
-        },
-      });
-    }
-  };
-
-  const ref = useInfinityScroll(fetchNextPage);
+  const { data, updateQuery } = useConversationsQuery();
 
   useMessageCreatedSubscription({
     onData: ({ data: { data } }) => {
@@ -120,63 +95,7 @@ export function BaseLayout() {
 
   return (
     <>
-      <Modal
-        open={openModalCreateNewGroup}
-        onClose={handleCloseModalCreateNewGroup}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 500,
-            height: 600,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
-          <Typography
-            id="modal-modal-title"
-            variant="h6"
-            component="h2"
-            fontWeight="bolder"
-          >
-            Create New Group
-          </Typography>
-
-          <TextField
-            label="Name"
-            margin="normal"
-            placeholder="Enter group name"
-            InputLabelProps={{ shrink: true }}
-          />
-          <TextField
-            label="Search to add members"
-            margin="normal"
-            placeholder="Enter the name of the users you want to add"
-            InputLabelProps={{ shrink: true }}
-          />
-          <TextField
-            label="Membbers"
-            margin="normal"
-            placeholder="Empty"
-            InputLabelProps={{ shrink: true }}
-          />
-          <Button
-            variant="contained"
-            sx={{ marginLeft: "auto", marginTop: "auto" }}
-          >
-            Create
-          </Button>
-        </Box>
-      </Modal>
-      <Box display="flex">
+      <Box display="flex" width="100vw">
         <Box
           p={2}
           borderRight={1}
@@ -203,7 +122,7 @@ export function BaseLayout() {
           >
             <Messenger />
           </IconButton>
-          <IconButton>
+          <IconButton component={Link} to="/friends">
             <Users />
           </IconButton>
           {userData && (
@@ -278,41 +197,7 @@ export function BaseLayout() {
             </>
           )}
         </Box>
-        <Grid container>
-          <Grid
-            item
-            xs={4}
-            borderRight={1}
-            borderColor="rgba(0, 0, 0, 0.12)"
-            sx={{
-              height: "100vh",
-              overflowY: "auto",
-              p: 2,
-              bgcolor: "#F8FAFF",
-            }}
-          >
-            <Typography variant="h4">Chats</Typography>
-            <SearchUser />
-            <Button
-              onClick={handleOpenModalCreateNewGroup}
-              startIcon={<UsersPlus />}
-              sx={{
-                color: "#727375",
-                width: "100%",
-                border: "1px solid #eee",
-                bgcolor: "white",
-                py: 2,
-              }}
-            >
-              Add new group
-            </Button>
-            {loading ? <LoadingSpinner /> : <ConversationList data={data} />}
-            <Box ref={ref} />
-          </Grid>
-          <Grid item xs={8}>
-            <Outlet />
-          </Grid>
-        </Grid>
+        <Outlet />
       </Box>
       <ProfileModal open={openProfile} onClose={() => setOpenProfile(false)} />
     </>

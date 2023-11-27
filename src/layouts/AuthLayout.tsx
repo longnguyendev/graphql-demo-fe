@@ -2,6 +2,7 @@ import { Box, Grid, Paper } from "@mui/material";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/hooks";
 import logo from "@/assets/images/logo.png";
+import "../index.css";
 
 export function AuthLayout() {
   const { isAuth } = useAuth();

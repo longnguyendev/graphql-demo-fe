@@ -15,21 +15,25 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       borderRadius={5}
       pl={2}
       sx={{
-        borderColor: "black",
-        borderWidth: 1,
-        borderStyle: "solid",
+        py: 1,
+        // borderColor: "black",
+        // borderWidth: 1,
+        // borderStyle: "solid",
+        bgcolor: "#EAF2FE",
       }}
       component="form"
       onSubmit={onSubmit}
     >
+      <IconButton type="submit">{icon}</IconButton>
+
       <InputBase
         ref={ref}
         fullWidth
         autoComplete="off"
         {...props}
         inputProps={{ maxLength: 1000 }}
+        sx={{ bgcolor: "transparent" }}
       />
-      <IconButton type="submit">{icon}</IconButton>
     </Box>
   )
 );

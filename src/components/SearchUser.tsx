@@ -3,17 +3,17 @@ import { Input, LoadingSpinner, SearchUserList } from ".";
 import {
   GetUsersQueryVariables,
   useCreateConversationMutation,
-  useGetUsersLazyQuery,
+  useGetUsersQuery,
 } from "@/gql/graphql";
 import { SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Search } from "@mui/icons-material";
 import { useCallback, useRef, useState } from "react";
 import { useOnClickOutside } from "usehooks-ts";
 import { useInfinityScroll } from "@/hooks";
+import { Search } from "@/assets/icons/Search";
 
-const FIRST = 20;
+const FIRST = 2;
 
 const defaultValues = {
   search: "",
@@ -31,8 +31,11 @@ export function SearchUser() {
     defaultValues,
   });
 
-  const [getUser, { data, updateQuery, fetchMore, loading }] =
-    useGetUsersLazyQuery();
+  const { data, refetch, updateQuery, fetchMore, loading } = useGetUsersQuery({
+    variables: {
+      first: FIRST,
+    },
+  });
 
   const fetchNextPage = useCallback(() => {
     if (data?.users.nextCursor) {
@@ -52,11 +55,9 @@ export function SearchUser() {
   const [open, setOpen] = useState(false);
 
   const onSubmit: SubmitHandler<GetUsersQueryVariables> = ({ search }) =>
-    getUser({
-      variables: {
-        first: FIRST,
-        search,
-      },
+    refetch({
+      first: FIRST,
+      search,
     });
 
   const onClick = (id: number) =>
@@ -91,7 +92,7 @@ export function SearchUser() {
         onSubmit={handleSubmit(onSubmit)}
         icon={<Search />}
         {...register("search")}
-        placeholder="Enter name"
+        placeholder="Search"
         onFocus={() => {
           setOpen(true);
         }}

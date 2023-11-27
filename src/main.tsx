@@ -15,21 +15,26 @@ import {
   HomePage,
   ConversationPage,
   NotFoundPage,
+  FrendsPage,
 } from "./pages";
 import { AuthLayout, BaseLayout } from "./layouts";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { ConversationLayout } from "./layouts/ConversationLayout.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route>
       <Route path="/" element={<PrivateRoute />}>
         <Route element={<BaseLayout />}>
-          <Route index element={<HomePage />} />
-          <Route
-            path="conversation/:conversationId"
-            element={<ConversationPage />}
-          />
+          <Route element={<ConversationLayout />}>
+            <Route index element={<HomePage />} />
+            <Route
+              path="conversation/:conversationId"
+              element={<ConversationPage />}
+            />
+          </Route>
+          <Route path="/friends" element={<FrendsPage />} />
         </Route>
       </Route>
       <Route element={<AuthLayout />}>

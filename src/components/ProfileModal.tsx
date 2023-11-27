@@ -1,9 +1,4 @@
-import {
-  Gender,
-  UpdateUserInput,
-  useMeLazyQuery,
-  useUpdateUserMutation,
-} from "@/gql/graphql";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useToast } from "@/hooks";
 import { options } from "@/pages";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -21,8 +16,13 @@ import {
   Typography,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
+import {
+  Gender,
+  UpdateUserInput,
+  useMeLazyQuery,
+  useUpdateUserMutation,
+} from "@/gql/graphql";
 import { endOfDay, subYears } from "date-fns";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
 
 export const regex = /^[\p{L}\s]+$/u;
@@ -62,7 +62,7 @@ interface ProfileModalProps {
 }
 
 export function ProfileModal({ open, onClose }: ProfileModalProps) {
-  const [fetchMe] = useMeLazyQuery();
+  const [fetchMe, { updateQuery }] = useMeLazyQuery();
 
   const {
     register,
@@ -88,7 +88,10 @@ export function ProfileModal({ open, onClose }: ProfileModalProps) {
   const toast = useToast();
 
   const [update] = useUpdateUserMutation({
-    onCompleted: () => {
+    onCompleted: (data) => {
+      updateQuery(() => ({
+        me: data.updateUser,
+      }));
       toast({ status: "success", message: "Success" });
       onClose();
     },

@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Divider, InputBase, Typography } from "@mui/material";
 import { useInfinityScroll } from "@/hooks";
 import {
   CreateMessageInput,
@@ -9,12 +9,12 @@ import {
   useMessagesQuery,
 } from "@/gql/graphql";
 import { useCallback } from "react";
-import { SendOutlined } from "@mui/icons-material";
 import * as yup from "yup";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate, useParams } from "react-router-dom";
-import { MessageList, Input, LoadingSpinner } from "@/components";
+import { MessageList, LoadingSpinner } from "@/components";
+import { Send } from "@/assets/icons/Send";
 
 const FIRST = 20;
 
@@ -113,13 +113,7 @@ export function ConversationPage() {
   });
 
   return (
-    <Box
-      height="100vh"
-      display="flex"
-      flexDirection="column"
-      px={2}
-      bgcolor="#F0F4FA"
-    >
+    <Box height="100vh" display="flex" flexDirection="column" bgcolor="#F0F4FA">
       <Typography textAlign="center" p={2} fontWeight="bold">
         {conversationData?.conversation.name}
       </Typography>
@@ -129,6 +123,7 @@ export function ConversationPage() {
         flex={1}
         overflow="auto"
         rowGap={0.5}
+        px={2}
       >
         {loading ? (
           <LoadingSpinner />
@@ -137,11 +132,28 @@ export function ConversationPage() {
         )}
         <Box ref={ref} />
       </Box>
-      <Input
+      <Divider sx={{ mt: 2 }} />
+      <Box
+        component="form"
+        display="flex"
+        p={2.5}
+        bgcolor="#F7F9FD"
         onSubmit={handleSubmit(onSubmit)}
-        icon={<SendOutlined />}
-        {...register("content")}
-      />
+      >
+        <InputBase
+          fullWidth
+          placeholder="Write a message"
+          {...register("content")}
+          sx={{ bgcolor: "#EAF2FE", borderRadius: 3, px: 4, py: 1 }}
+        />
+        <Button
+          type="submit"
+          variant="contained"
+          sx={{ ml: 3, borderRadius: 1.5, minWidth: "unset", px: 1.5 }}
+        >
+          <Send />
+        </Button>
+      </Box>
     </Box>
   );
 }
