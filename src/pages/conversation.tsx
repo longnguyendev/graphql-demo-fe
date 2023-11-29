@@ -260,6 +260,7 @@ export function ConversationPage() {
             {...methods.register("content")}
             sx={{ bgcolor: "#EAF2FE", borderRadius: 3, px: 4, py: 1 }}
           />
+          {/* call emoji component */}
           <EmojiPickerButton>
             <IconButton sx={{ width: "50px", height: "50px", ml: 2 }}>
               <SentimentSatisfiedAlt />
