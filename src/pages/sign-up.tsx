@@ -96,6 +96,8 @@ const schema = yup
     rePassword: yup
       .string()
       .oneOf([yup.ref("password")], "Not Matching Password")
+      .min(6, "Password contains at least 6 characters")
+      .max(255, "Password must not exceed 255 characters")
       .required("Re-password is required"),
     gender: yup
       .mixed<Gender>()
