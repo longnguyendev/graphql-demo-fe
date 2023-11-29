@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   Divider,
+  IconButton,
   InputBase,
   Menu,
   MenuItem,
@@ -21,12 +22,14 @@ import {
 } from "@/gql/graphql";
 import { useCallback, useState } from "react";
 import * as yup from "yup";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate, useParams } from "react-router-dom";
 import { MessageList, LoadingSpinner } from "@/components";
 import { Send } from "@/assets/icons/Send";
-import { MoreVert } from "@mui/icons-material";
+import { MoreVert, SentimentSatisfiedAlt } from "@mui/icons-material";
+
+import { EmojiPickerButton } from "@/components/EmojiPickerButton";
 
 const FIRST = 20;
 
@@ -55,7 +58,7 @@ export function ConversationPage() {
     onError: () => navigate("/", { replace: true }),
   });
 
-  const { register, handleSubmit, reset } = useForm<Schema>({
+  const methods = useForm<Schema>({
     resolver: yupResolver(schema),
     defaultValues: {
       content: "",
@@ -123,7 +126,7 @@ export function ConversationPage() {
   };
 
   const [createMessage] = useCreateMessageMutation({
-    onCompleted: () => reset(),
+    onCompleted: () => methods.reset(),
     onError: ({ message }) => {
       toast({
         status: "error",
@@ -180,84 +183,97 @@ export function ConversationPage() {
   };
 
   return (
-    <Box height="100vh" display="flex" flexDirection="column" bgcolor="#F0F4FA">
-      <Stack
-        p={1}
-        bgcolor="white"
-        flexDirection="row"
-        justifyContent="space-between"
+    <FormProvider {...methods}>
+      <Box
+        height="100vh"
+        display="flex"
+        flexDirection="column"
+        bgcolor="#F0F4FA"
       >
-        <Typography textAlign="center" p={2} fontWeight="bold">
-          {conversationData?.conversation.name}
-        </Typography>
-        <Button
-          id="basic-button"
-          aria-controls={open ? "basic-menu" : undefined}
-          aria-haspopup="true"
-          aria-expanded={open ? "true" : undefined}
-          onClick={handleClick}
+        <Stack
+          p={1}
+          bgcolor="white"
+          flexDirection="row"
+          justifyContent="space-between"
         >
-          <MoreVert />
-        </Button>
-        <Menu
-          id="basic-menu"
-          anchorEl={anchorEl}
-          open={open}
-          onClose={handleClose}
-          MenuListProps={{
-            "aria-labelledby": "basic-button",
-          }}
-        >
-          <MenuItem
-            onClick={() => {
-              handleClose();
-              exitConverSation();
+          <Typography textAlign="center" p={2} fontWeight="bold">
+            {conversationData?.conversation.name}
+          </Typography>
+          <Button
+            id="basic-button"
+            aria-controls={open ? "basic-menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? "true" : undefined}
+            onClick={handleClick}
+          >
+            <MoreVert />
+          </Button>
+          <Menu
+            id="basic-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            MenuListProps={{
+              "aria-labelledby": "basic-button",
             }}
           >
-            Rời Nhóm
-          </MenuItem>
-        </Menu>
-      </Stack>
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                exitConverSation();
+              }}
+            >
+              Rời Nhóm
+            </MenuItem>
+          </Menu>
+        </Stack>
 
-      <Box
-        display="flex"
-        flexDirection="column-reverse"
-        flex={1}
-        overflow="auto"
-        rowGap={0.5}
-        px={2}
-      >
-        {loading ? (
-          <LoadingSpinner />
-        ) : (
-          <MessageList data={data} userId={userData?.me.id} />
-        )}
-        <Box ref={ref} />
-      </Box>
-      <Divider sx={{ mt: 2 }} />
-      <Box
-        component="form"
-        display="flex"
-        p={2.5}
-        bgcolor="#F7F9FD"
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <InputBase
-          fullWidth
-          placeholder="Write a message"
-          autoComplete="off"
-          inputProps={{ maxLength: 1000 }}
-          {...register("content")}
-          sx={{ bgcolor: "#EAF2FE", borderRadius: 3, px: 4, py: 1 }}
-        />
-        <Button
-          type="submit"
-          variant="contained"
-          sx={{ ml: 3, borderRadius: 1.5, minWidth: "unset", px: 1.5 }}
+        <Box
+          display="flex"
+          flexDirection="column-reverse"
+          flex={1}
+          overflow="auto"
+          rowGap={0.5}
+          px={2}
         >
-          <Send />
-        </Button>
+          {loading ? (
+            <LoadingSpinner />
+          ) : (
+            <MessageList data={data} userId={userData?.me.id} />
+          )}
+          <Box ref={ref} />
+        </Box>
+        <Divider sx={{ mt: 2 }} />
+        <Box
+          width="100%"
+          component="form"
+          display="flex"
+          p={2.5}
+          bgcolor="#F7F9FD"
+          onSubmit={methods.handleSubmit(onSubmit)}
+        >
+          <InputBase
+            fullWidth
+            placeholder="Write a message"
+            autoComplete="off"
+            inputProps={{ maxLength: 1000 }}
+            {...methods.register("content")}
+            sx={{ bgcolor: "#EAF2FE", borderRadius: 3, px: 4, py: 1 }}
+          />
+          <EmojiPickerButton>
+            <IconButton sx={{ width: "50px", height: "50px", ml: 2 }}>
+              <SentimentSatisfiedAlt />
+            </IconButton>
+          </EmojiPickerButton>
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{ ml: 3, borderRadius: 1.5, minWidth: "unset", px: 1.5 }}
+          >
+            <Send />
+          </Button>
+        </Box>
       </Box>
-    </Box>
+    </FormProvider>
   );
 }

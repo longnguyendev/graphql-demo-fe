@@ -78,6 +78,8 @@ export function BaseLayout() {
 
         const { conversationCreated } = data;
 
+        console.log(conversationCreated);
+
         return {
           ...prev,
           conversations: {
