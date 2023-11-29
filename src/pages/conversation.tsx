@@ -1,20 +1,32 @@
-import { Box, Button, Divider, InputBase, Typography } from "@mui/material";
-import { useInfinityScroll } from "@/hooks";
+import {
+  Box,
+  Button,
+  Divider,
+  InputBase,
+  Menu,
+  MenuItem,
+  Stack,
+  Typography,
+} from "@mui/material";
+import { useInfinityScroll, useToast } from "@/hooks";
 import {
   CreateMessageInput,
   useConversationQuery,
+  useConversationsQuery,
   useCreateMessageMutation,
   useMeQuery,
   useMessageCreatedSubscription,
   useMessagesQuery,
+  useUpdateConversationMutation,
 } from "@/gql/graphql";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import * as yup from "yup";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate, useParams } from "react-router-dom";
 import { MessageList, LoadingSpinner } from "@/components";
 import { Send } from "@/assets/icons/Send";
+import { MoreVert } from "@mui/icons-material";
 
 const FIRST = 20;
 
@@ -27,11 +39,14 @@ const schema = yup
 type Schema = Omit<CreateMessageInput, "conversationId">;
 
 export function ConversationPage() {
+  const toast = useToast();
   const { conversationId: _conversationId } = useParams();
 
   const conversationId = Number(_conversationId);
 
   const navigate = useNavigate();
+
+  const { updateQuery: updateConversationsQuery } = useConversationsQuery();
 
   const { data: conversationData } = useConversationQuery({
     variables: {
@@ -70,8 +85,51 @@ export function ConversationPage() {
 
   const ref = useInfinityScroll(fetchNextPage);
 
+  const [updateConverSation] = useUpdateConversationMutation();
+
+  const exitConverSation = () => {
+    if (conversationData) {
+      const participantIds = conversationData?.conversation.participants
+        .filter((participant) => userData?.me.id !== participant.id)
+        .map((participant) => participant.id);
+
+      updateConverSation({
+        variables: {
+          updateConversationInput: {
+            id: conversationData.conversation.id,
+            name: conversationData.conversation.name,
+            participantIds,
+          },
+        },
+        onCompleted: () => {
+          updateConversationsQuery((prev) => {
+            const nodes = prev.conversations.nodes?.filter(
+              (node) => node.id !== conversationId
+            );
+
+            return {
+              ...prev,
+              conversations: {
+                ...prev.conversations,
+                nodes,
+                totalCount: prev.conversations.totalCount - 1,
+              },
+            };
+          });
+          navigate("/", { replace: true });
+        },
+      });
+    }
+  };
+
   const [createMessage] = useCreateMessageMutation({
     onCompleted: () => reset(),
+    onError: ({ message }) => {
+      toast({
+        status: "error",
+        message: message,
+      });
+    },
   });
 
   const onSubmit: SubmitHandler<Schema> = (createMessageInput) => {
@@ -112,11 +170,55 @@ export function ConversationPage() {
     },
   });
 
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <Box height="100vh" display="flex" flexDirection="column" bgcolor="#F0F4FA">
-      <Typography textAlign="center" p={2} fontWeight="bold">
-        {conversationData?.conversation.name}
-      </Typography>
+      <Stack
+        p={1}
+        bgcolor="white"
+        flexDirection="row"
+        justifyContent="space-between"
+      >
+        <Typography textAlign="center" p={2} fontWeight="bold">
+          {conversationData?.conversation.name}
+        </Typography>
+        <Button
+          id="basic-button"
+          aria-controls={open ? "basic-menu" : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? "true" : undefined}
+          onClick={handleClick}
+        >
+          <MoreVert />
+        </Button>
+        <Menu
+          id="basic-menu"
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+          MenuListProps={{
+            "aria-labelledby": "basic-button",
+          }}
+        >
+          <MenuItem
+            onClick={() => {
+              handleClose();
+              exitConverSation();
+            }}
+          >
+            Rời Nhóm
+          </MenuItem>
+        </Menu>
+      </Stack>
+
       <Box
         display="flex"
         flexDirection="column-reverse"
@@ -143,6 +245,8 @@ export function ConversationPage() {
         <InputBase
           fullWidth
           placeholder="Write a message"
+          autoComplete="off"
+          inputProps={{ maxLength: 1000 }}
           {...register("content")}
           sx={{ bgcolor: "#EAF2FE", borderRadius: 3, px: 4, py: 1 }}
         />

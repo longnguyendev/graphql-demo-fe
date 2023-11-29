@@ -1,17 +1,17 @@
-import { ConversationsQuery } from "@/gql/graphql";
+import { ConversationDataFragment } from "@/gql/graphql";
 import { EmptyBox } from ".";
 import { ConversationListItem } from "./ConversationListItem";
 import { List } from "@mui/material";
 
 interface ConversationListProps {
-  data?: ConversationsQuery;
+  nodes: ConversationDataFragment[];
 }
 
-export function ConversationList({ data }: ConversationListProps) {
-  if (data?.conversations.nodes?.length) {
+export function ConversationList({ nodes }: ConversationListProps) {
+  if (nodes.length) {
     return (
       <List>
-        {data.conversations.nodes.map((node) => (
+        {nodes.map((node) => (
           <ConversationListItem key={node.id} {...node} />
         ))}
       </List>

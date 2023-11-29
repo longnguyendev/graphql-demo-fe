@@ -100,7 +100,12 @@ export function ProfileModal({ open, onClose }: ProfileModalProps) {
   const onSubmit: SubmitHandler<UpdateUserInput> = (updateUserInput) => {
     updateUserInput.firstName = updateUserInput.firstName?.trim();
     updateUserInput.lastName = updateUserInput.lastName?.trim();
-    updateUserInput.bio = updateUserInput.bio?.trim();
+    if (updateUserInput.bio) {
+      updateUserInput.bio = updateUserInput.bio?.trim();
+    } else {
+      delete updateUserInput.bio;
+    }
+    console.log(updateUserInput);
     update({ variables: { updateUserInput } });
   };
 
@@ -168,6 +173,7 @@ export function ProfileModal({ open, onClose }: ProfileModalProps) {
           margin="normal"
           label="Bio"
           multiline={true}
+          inputProps={{ maxLength: 200 }}
           rows={3}
           fullWidth
           autoComplete="family-name"

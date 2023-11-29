@@ -1,27 +1,18 @@
-import { UsersPlus } from "@/assets/icons";
 import { ConversationList, LoadingSpinner, SearchUser } from "@/components";
-import { CreateNewGroup } from "@/components/CreateNewGroup";
+
 import { useConversationsQuery } from "@/gql/graphql";
 import { useInfinityScroll } from "@/hooks";
-import { Box, Button, Grid, Typography } from "@mui/material";
-import { useState } from "react";
+import { Box, Grid, Typography } from "@mui/material";
+
 import { Outlet } from "react-router-dom";
 
 const FIRST = 20;
 
-export function ConversationLayout() {
+export function FriendsLayout() {
   const { data, fetchMore, loading } = useConversationsQuery();
 
-  const [openCreateNewGroup, setOpenCreateNewGroup] = useState(false);
-
-  const handleOpenCreateNewGroup = () => {
-    setOpenCreateNewGroup(true);
-  };
-  const handleCloseCreateNewGroup = () => {
-    setOpenCreateNewGroup(false);
-  };
-
   const fetchNextPage = () => {
+    data?.conversations.nodes?.filter((node) => node.participants.length === 2);
     if (data?.conversations.nextCursor) {
       fetchMore({
         variables: {
@@ -50,28 +41,17 @@ export function ConversationLayout() {
       >
         <Typography variant="h4">Chats</Typography>
         <SearchUser />
-        <Button
-          onClick={handleOpenCreateNewGroup}
-          startIcon={<UsersPlus />}
-          sx={{
-            color: "#727375",
-            width: "100%",
-            border: "1px solid #eee",
-            bgcolor: "white",
-            py: 2,
-          }}
-        >
-          Add new group
-        </Button>
-        <Typography py={2}>All chats</Typography>
-        <CreateNewGroup
-          open={openCreateNewGroup}
-          onClose={handleCloseCreateNewGroup}
-        />
+        <Typography py={2}>All friend chats</Typography>
         {loading ? (
           <LoadingSpinner />
         ) : (
-          <ConversationList nodes={data?.conversations.nodes ?? []} />
+          <ConversationList
+            nodes={
+              data?.conversations.nodes?.filter(
+                (node) => node.participants.length === 2
+              ) ?? []
+            }
+          />
         )}
         <Box ref={ref} />
       </Grid>

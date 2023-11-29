@@ -18,8 +18,12 @@ import {
 
 import { SubmitHandler, useForm } from "react-hook-form";
 
+import * as yup from "yup";
+
 import { useState } from "react";
 import { stringAvatar } from "@/utils";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useToast } from "@/hooks";
 
 interface CreateNewGroupProps {
   open: boolean;
@@ -39,11 +43,23 @@ export const CreateNewGroup = ({ open, onClose }: CreateNewGroupProps) => {
   const { register, handleSubmit, reset } =
     useForm<GetUsersNotMeQueryVariables>();
 
+  const schema = yup.object({
+    name: yup
+      .string()
+      .max(50, "group name must not exceed 50 characters")
+      .nullable(),
+  });
+
   const {
     register: createRegister,
     handleSubmit: handleCreate,
     reset: resetCreateGroup,
-  } = useForm<CreateNewGroup>();
+    formState: { errors },
+  } = useForm<CreateNewGroup>({
+    resolver: yupResolver(schema),
+  });
+
+  const toast = useToast();
 
   const onSubmit: SubmitHandler<GetUsersNotMeQueryVariables> = ({ search }) => {
     fetchUsers({
@@ -54,7 +70,7 @@ export const CreateNewGroup = ({ open, onClose }: CreateNewGroupProps) => {
   };
 
   const onCreate: SubmitHandler<CreateNewGroup> = ({ name }) => {
-    if (selectedOptions.length != 0) {
+    if (selectedOptions.length > 1) {
       createConversation({
         variables: {
           createConversationInput: {
@@ -71,7 +87,13 @@ export const CreateNewGroup = ({ open, onClose }: CreateNewGroupProps) => {
           resetCreateGroup();
         },
       });
+      toast({ status: "success", message: "success" });
+      return;
     }
+    toast({
+      status: "warning",
+      message: "Choose more 2 another to create new group",
+    });
   };
 
   return (
@@ -116,6 +138,8 @@ export const CreateNewGroup = ({ open, onClose }: CreateNewGroupProps) => {
             margin="normal"
             placeholder="Enter group name"
             {...createRegister("name")}
+            error={Boolean(errors.name)}
+            helperText={errors.name?.message}
             InputLabelProps={{ shrink: true }}
           />
         </Box>

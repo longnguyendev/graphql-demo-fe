@@ -21,7 +21,6 @@ export function ConversationListItem({
   createdAt,
 }: ConversationListItemProps) {
   const match = useMatch(`/conversation/${id}`);
-
   return (
     <ListItem alignItems="flex-start" disablePadding sx={{ mb: 2 }}>
       <ListItemButton

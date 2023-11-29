@@ -56,14 +56,17 @@ const defaultValues: CreateUserInputValidate = {
 
 const regex = /^[\p{L}\s]+$/u;
 
+const regexEmail = /^[^*]*$/;
+
 const schema = yup
   .object({
     email: yup
       .string()
       .trim()
       .email("Enter valid email")
-      .required("Email is required")
-      .max(255, "Email must not exceed 255 characters"),
+      .matches(regexEmail, "Enter valid email")
+      .max(255, "Email must not exceed 255 characters")
+      .required("Email is required"),
     firstName: yup
       .string()
       .trim("First name contains at least 2 characters")

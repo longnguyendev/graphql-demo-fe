@@ -115,10 +115,15 @@ export function BaseLayout() {
             />
           </IconButton>
           <IconButton
-            {...(data?.conversations.nodes?.[0]?.id && {
-              component: Link,
-              to: `/conversation/${data.conversations.nodes[0].id}`,
-            })}
+            {...(data?.conversations.nodes?.[0]?.id
+              ? {
+                  component: Link,
+                  to: `/conversation/${data.conversations.nodes[0].id}`,
+                }
+              : {
+                  component: Link,
+                  to: `/`,
+                })}
           >
             <Messenger />
           </IconButton>

@@ -95,6 +95,7 @@ export type Mutation = {
   removeConversation: Conversation;
   removeMessage: Message;
   signUp: Auth;
+  updateConversation: Conversation;
   updateUser: User;
 };
 
@@ -126,6 +127,11 @@ export type MutationRemoveMessageArgs = {
 
 export type MutationSignUpArgs = {
   signUpInput: CreateUserInput;
+};
+
+
+export type MutationUpdateConversationArgs = {
+  updateConversationInput: UpdateConversationInput;
 };
 
 
@@ -216,6 +222,12 @@ export type SubscriptionMessageCreatedArgs = {
   conversationId?: InputMaybe<Scalars['Float']['input']>;
 };
 
+export type UpdateConversationInput = {
+  id: Scalars['Float']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  participantIds?: InputMaybe<Array<Scalars['Float']['input']>>;
+};
+
 export type UpdateUserInput = {
   bio?: InputMaybe<Scalars['String']['input']>;
   dob?: InputMaybe<Scalars['Date']['input']>;
@@ -260,12 +272,12 @@ export type LoginMutationVariables = Exact<{
 
 export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'Auth', accessToken: string } };
 
-export type ConversationDataFragment = { __typename?: 'Conversation', id: number, name: string, createdAt: any, updatedAt: any, lastMessage?: { __typename?: 'Message', content: string, createdAt: any } | null };
+export type ConversationDataFragment = { __typename?: 'Conversation', id: number, name: string, createdAt: any, updatedAt: any, participants: Array<{ __typename?: 'User', id: number }>, lastMessage?: { __typename?: 'Message', content: string, createdAt: any } | null };
 
 export type ConversationCreatedSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ConversationCreatedSubscription = { __typename?: 'Subscription', conversationCreated: { __typename?: 'Conversation', id: number, name: string, createdAt: any, updatedAt: any, lastMessage?: { __typename?: 'Message', content: string, createdAt: any } | null } };
+export type ConversationCreatedSubscription = { __typename?: 'Subscription', conversationCreated: { __typename?: 'Conversation', id: number, name: string, createdAt: any, updatedAt: any, participants: Array<{ __typename?: 'User', id: number }>, lastMessage?: { __typename?: 'Message', content: string, createdAt: any } | null } };
 
 export type ConversationsQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Float']['input']>;
@@ -273,21 +285,28 @@ export type ConversationsQueryVariables = Exact<{
 }>;
 
 
-export type ConversationsQuery = { __typename?: 'Query', conversations: { __typename?: 'PaginatedConversation', totalCount: number, nextCursor?: string | null, nodes?: Array<{ __typename?: 'Conversation', id: number, name: string, createdAt: any, updatedAt: any, lastMessage?: { __typename?: 'Message', content: string, createdAt: any } | null }> | null } };
+export type ConversationsQuery = { __typename?: 'Query', conversations: { __typename?: 'PaginatedConversation', totalCount: number, nextCursor?: string | null, nodes?: Array<{ __typename?: 'Conversation', id: number, name: string, createdAt: any, updatedAt: any, participants: Array<{ __typename?: 'User', id: number }>, lastMessage?: { __typename?: 'Message', content: string, createdAt: any } | null }> | null } };
 
 export type ConversationQueryVariables = Exact<{
   conversationId: Scalars['Float']['input'];
 }>;
 
 
-export type ConversationQuery = { __typename?: 'Query', conversation: { __typename?: 'Conversation', name: string } };
+export type ConversationQuery = { __typename?: 'Query', conversation: { __typename?: 'Conversation', id: number, name: string, participants: Array<{ __typename?: 'User', id: number }> } };
 
 export type CreateConversationMutationVariables = Exact<{
   createConversationInput: CreateConversationInput;
 }>;
 
 
-export type CreateConversationMutation = { __typename?: 'Mutation', createConversation: { __typename?: 'Conversation', id: number, name: string, createdAt: any, updatedAt: any, lastMessage?: { __typename?: 'Message', content: string, createdAt: any } | null } };
+export type CreateConversationMutation = { __typename?: 'Mutation', createConversation: { __typename?: 'Conversation', id: number, name: string, createdAt: any, updatedAt: any, participants: Array<{ __typename?: 'User', id: number }>, lastMessage?: { __typename?: 'Message', content: string, createdAt: any } | null } };
+
+export type UpdateConversationMutationVariables = Exact<{
+  updateConversationInput: UpdateConversationInput;
+}>;
+
+
+export type UpdateConversationMutation = { __typename?: 'Mutation', updateConversation: { __typename?: 'Conversation', id: number, name: string, createdAt: any, updatedAt: any, participants: Array<{ __typename?: 'User', id: number }>, lastMessage?: { __typename?: 'Message', content: string, createdAt: any } | null } };
 
 export type MessageDataFragment = { __typename?: 'Message', id: number, content: string, createdAt: any, sender: { __typename?: 'User', id: number, email: string, name: string, lastName: string, firstName: string, dob: any, gender: Gender, bio?: string | null }, conversation: { __typename?: 'Conversation', id: number } };
 
@@ -355,6 +374,9 @@ export const ConversationDataFragmentDoc = gql`
     fragment ConversationData on Conversation {
   id
   name
+  participants {
+    id
+  }
   createdAt
   updatedAt
   lastMessage {
@@ -526,7 +548,11 @@ export type ConversationsQueryResult = Apollo.QueryResult<ConversationsQuery, Co
 export const ConversationDocument = gql`
     query Conversation($conversationId: Float!) {
   conversation(conversationId: $conversationId) {
+    id
     name
+    participants {
+      id
+    }
   }
 }
     `;
@@ -591,6 +617,39 @@ export function useCreateConversationMutation(baseOptions?: Apollo.MutationHookO
 export type CreateConversationMutationHookResult = ReturnType<typeof useCreateConversationMutation>;
 export type CreateConversationMutationResult = Apollo.MutationResult<CreateConversationMutation>;
 export type CreateConversationMutationOptions = Apollo.BaseMutationOptions<CreateConversationMutation, CreateConversationMutationVariables>;
+export const UpdateConversationDocument = gql`
+    mutation UpdateConversation($updateConversationInput: UpdateConversationInput!) {
+  updateConversation(updateConversationInput: $updateConversationInput) {
+    ...ConversationData
+  }
+}
+    ${ConversationDataFragmentDoc}`;
+export type UpdateConversationMutationFn = Apollo.MutationFunction<UpdateConversationMutation, UpdateConversationMutationVariables>;
+
+/**
+ * __useUpdateConversationMutation__
+ *
+ * To run a mutation, you first call `useUpdateConversationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateConversationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateConversationMutation, { data, loading, error }] = useUpdateConversationMutation({
+ *   variables: {
+ *      updateConversationInput: // value for 'updateConversationInput'
+ *   },
+ * });
+ */
+export function useUpdateConversationMutation(baseOptions?: Apollo.MutationHookOptions<UpdateConversationMutation, UpdateConversationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateConversationMutation, UpdateConversationMutationVariables>(UpdateConversationDocument, options);
+      }
+export type UpdateConversationMutationHookResult = ReturnType<typeof useUpdateConversationMutation>;
+export type UpdateConversationMutationResult = Apollo.MutationResult<UpdateConversationMutation>;
+export type UpdateConversationMutationOptions = Apollo.BaseMutationOptions<UpdateConversationMutation, UpdateConversationMutationVariables>;
 export const MessageCreatedDocument = gql`
     subscription MessageCreated($conversationId: Float) {
   messageCreated(conversationId: $conversationId) {

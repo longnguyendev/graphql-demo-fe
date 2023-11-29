@@ -4,6 +4,9 @@ export const CONVERSATION_FRAGMENT = gql`
   fragment ConversationData on Conversation {
     id
     name
+    participants {
+      id
+    }
     createdAt
     updatedAt
     lastMessage {
@@ -36,7 +39,11 @@ export const GET_CONVERSATIONS = gql`
 export const GET_CONVERSATION = gql`
   query Conversation($conversationId: Float!) {
     conversation(conversationId: $conversationId) {
+      id
       name
+      participants {
+        id
+      }
     }
   }
 `;
@@ -46,6 +53,16 @@ export const CREATE_CONVERSATION_MUTATION = gql`
     $createConversationInput: CreateConversationInput!
   ) {
     createConversation(createConversationInput: $createConversationInput) {
+      ...ConversationData
+    }
+  }
+`;
+
+export const UPDATE_CONVERSATION_MUTATION = gql`
+  mutation UpdateConversation(
+    $updateConversationInput: UpdateConversationInput!
+  ) {
+    updateConversation(updateConversationInput: $updateConversationInput) {
       ...ConversationData
     }
   }

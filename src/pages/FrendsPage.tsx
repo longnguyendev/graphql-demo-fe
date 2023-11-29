@@ -1,15 +1,17 @@
-import { UsersPlus } from "@/assets/icons";
-import { ConversationList, LoadingSpinner, SearchUser } from "@/components";
-import { CreateNewGroup } from "@/components/CreateNewGroup";
-import { useConversationsQuery } from "@/gql/graphql";
-import { useInfinityScroll } from "@/hooks";
 import { Box, Button, Grid, Typography } from "@mui/material";
+import { None } from "../assets/images/None.tsx";
+import { SearchUser } from "@/components/SearchUser.tsx";
+import { UsersPlus } from "@/assets/icons/UsersPlus.tsx";
+import { CreateNewGroup } from "@/components/CreateNewGroup.tsx";
+import { LoadingSpinner } from "@/components/LoadingSpinner.tsx";
+import { ConversationList } from "@/components/ConversationList.tsx";
+import { useInfinityScroll } from "@/hooks/useInfinityScroll.ts";
+import { useConversationsQuery } from "@/gql/graphql.ts";
 import { useState } from "react";
-import { Outlet } from "react-router-dom";
 
 const FIRST = 20;
 
-export function ConversationLayout() {
+export function FrendsPage() {
   const { data, fetchMore, loading } = useConversationsQuery();
 
   const [openCreateNewGroup, setOpenCreateNewGroup] = useState(false);
@@ -22,6 +24,7 @@ export function ConversationLayout() {
   };
 
   const fetchNextPage = () => {
+    data?.conversations.nodes?.filter((node) => node.participants.length === 2);
     if (data?.conversations.nextCursor) {
       fetchMore({
         variables: {
@@ -35,10 +38,18 @@ export function ConversationLayout() {
   const ref = useInfinityScroll(fetchNextPage);
 
   return (
-    <Grid container width="calc(100vw - 124px)">
+    <Grid
+      container
+      minHeight="100vh"
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      flexDirection="row"
+      gap={1}
+    >
       <Grid
         item
-        xs={4}
+        xs={6}
         borderRight={1}
         borderColor="rgba(0, 0, 0, 0.12)"
         sx={{
@@ -63,7 +74,6 @@ export function ConversationLayout() {
         >
           Add new group
         </Button>
-        <Typography py={2}>All chats</Typography>
         <CreateNewGroup
           open={openCreateNewGroup}
           onClose={handleCloseCreateNewGroup}
@@ -75,8 +85,11 @@ export function ConversationLayout() {
         )}
         <Box ref={ref} />
       </Grid>
-      <Grid item xs={8}>
-        <Outlet />
+      <Grid xs={6}>
+        <None />
+        <Typography variant="h5" component="h1">
+          Select a conversation or start a new one
+        </Typography>
       </Grid>
     </Grid>
   );
