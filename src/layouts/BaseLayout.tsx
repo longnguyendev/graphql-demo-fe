@@ -133,7 +133,7 @@ export function BaseLayout() {
           {userData && (
             <>
               <IconButton onClick={handleClick} sx={{ mt: "auto" }}>
-                <Avatar {...stringAvatar(userData.me.name)}></Avatar>
+                <Avatar {...stringAvatar(userData.me.lastName)}></Avatar>
               </IconButton>
               <Menu
                 id="demo-positioned-menu"

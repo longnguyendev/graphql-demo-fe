@@ -25,13 +25,13 @@ export function MessageListItem({
     >
       <Avatar
         sx={{
-          bgcolor: stringToColor(sender.name),
+          bgcolor: stringToColor(sender.lastName),
           width: "30px",
           height: "30px",
           mx: 2,
         }}
       >
-        {sender.name[0]}
+        {sender.lastName[0]}
       </Avatar>
       <Tooltip
         title={formatDate(createdAt)}
@@ -52,7 +52,7 @@ export function MessageListItem({
           // initial={{ y: 20, opacity: 0 }}
           // whileInView={{ y: 0, opacity: 1 }}
           // viewport={{ once: true }}
-          // borderRadius={3}
+          borderRadius={3}
           {...(isSender
             ? {
                 ml: "auto",
